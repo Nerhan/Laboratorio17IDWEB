@@ -1,80 +1,3 @@
-console.log("=== EJERCICIO 3 ===");
-try {
-    let variableNoExiste;
-    console.log(variableNoExiste.propiedad);
-} catch (error) {
-    console.log("Error capturado:", error.message);
-}
-
-
-console.log("=== EJERCICIO 4 ===");
-try {
-    const jsonMalFormado = "{nombre: 'Pedro'}";
-    JSON.parse(jsonMalFormado);
-} catch (e) {
-    console.log("Nombre del error:", e.name);
-    console.log("Mensaje:", e.message);
-}
-
-
-console.log("=== EJERCICIO 5 ===");
-try {
-    console.logg("Esto va a fallar");
-} catch (error) {
-    console.log("falló");
-} finally {
-    console.log("siempre se ejecuta");
-}
-
-
-console.log("=== EJERCICIO 6 ===");
-function validarEdad(edad) {
-    if (typeof edad !== "number" || edad < 0) {
-        throw new Error("Edad inválida");
-    }
-    console.log("Edad válida:", edad);
-}
-
-try { validarEdad(-10); } catch (e) { console.log("Error:", e.message); }
-try { validarEdad("veinte"); } catch (e) { console.log("Error:", e.message); }
-try { validarEdad(25); } catch (e) { console.log(e.message); }
-
-
-console.log("=== EJERCICIO 7 ===");
-try {
-    let obj = null;
-    obj.nombre.toUpperCase();
-} catch (error) {
-    if (error instanceof TypeError) {
-        console.log("TypeError detectado:", error.message);
-    } else {
-        console.log("Otro tipo de error");
-    }
-}
-
-
-console.log("=== EJERCICIO 8 ===");
-function nivel2() {
-    console.log(x);
-}
-
-function nivel1() {
-    try {
-        nivel2();
-    } catch (e) {
-        console.log("Nivel 2 atrapó el error:", e.message);
-        throw e;
-    }
-}
-
-try {
-    nivel1();
-} catch (e) {
-    console.log("Nivel 1 recibió el error:", e.message);
-    console.log("ERROR FINAL capturado en el nivel superior:", e.message);
-}
-
-
 console.log("=== EJERCICIO 9 ===");
 function cargarMensaje(callback) {
     setTimeout(() => {
@@ -120,3 +43,133 @@ dividirAsync(10, 0, (err, resultado) => {
     if (err) console.log("Error:", err.message);
     else console.log("Resultado:", resultado);
 });
+
+console.log("\n=== EJERCICIO 12 ===");
+function procesarLista(arr, callbackFinal) {
+    if (arr.length === 0) {
+        callbackFinal("Proceso completado");
+        return;
+    }
+
+    let indice = 0;
+
+    function procesarSiguiente() {
+        if (indice >= arr.length) {
+            callbackFinal("Proceso completado");
+            return;
+        }
+
+        console.log(`Procesando ... ${arr[indice]}`);
+        const tiempo = Math.floor(Math.random() * 1001) + 500; // 500-1500 ms
+
+        setTimeout(() => {
+            indice++;
+            procesarSiguiente();
+        }, tiempo);
+    }
+
+    procesarSiguiente();
+}
+
+procesarLista([1, 2, 3, 4, 5], (msg) => console.log(msg));
+
+console.log("\n=== EJERCICIO 13 (promesas) ===");
+function cargarMensajePromise() {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve("Mensaje cargado Ejercicio13y17"), 1000);
+    });
+}
+
+cargarMensajePromise().then(msg => console.log(msg));
+
+console.log("\n=== EJERCICIO 14 (promesas) ===");
+function cargarUsuarioPromise() {
+    const tiempo = Math.floor(Math.random() * 701) + 800;
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({ id: 1, nombre: "Juancito" });
+        }, tiempo);
+    });
+}
+
+cargarUsuarioPromise()
+    .then(user => console.log(`Usuario cargado: ${user.nombre} (ID: ${user.id})`));
+
+console.log("\n=== EJERCICIO 15 (promesas) ===");
+function dividirAsyncPromise(a, b) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (b === 0) {
+                reject(new Error("No se puede dividir entre cero"));
+            } else {
+                resolve(a / b);
+            }
+        }, 1500);
+    });
+}
+
+dividirAsyncPromise(20, 4)
+    .then(result => console.log("Resultado:", result))
+    .catch(err => console.log("Error:", err.message));
+
+dividirAsyncPromise(10, 0)
+    .then(result => console.log("Resultado:", result))
+    .catch(err => console.log("Error:", err.message));
+
+console.log("\n=== EJERCICIO 16 (promesas) ===");
+function procesarListaPromise(arr) {
+    const promesas = arr.map(numero => {
+        return new Promise(resolve => {
+            console.log(`Procesando ... ${numero}`);
+            const tiempo = Math.floor(Math.random() * 1001) + 500;
+            setTimeout(() => resolve(), tiempo);
+        });
+    });
+
+    return Promise.all(promesas).then(() => "Proceso completado");
+}
+
+procesarListaPromise([10, 20, 30, 40])
+    .then(msg => console.log(msg));
+
+console.log("\n=== EJERCICIO 17 (async/await) ===");
+async function mostrarMensaje() {
+    const msg = await cargarMensajePromise();
+    console.log(msg);
+}
+mostrarMensaje();
+
+
+console.log("\n=== EJERCICIO 18 (async/await) ===");
+async function mostrarUsuario() {
+    const user = await cargarUsuarioPromise();
+    console.log(`Usuario cargado: ${user.nombre} (ID: ${user.id})`+` Ejercicio18`);
+}
+mostrarUsuario();
+
+
+console.log("\n=== EJERCICIO 19 (async/await) ===");
+async function dividirSeguro(a, b) {
+    try {
+        const resultado = await dividirAsyncPromise(a, b);
+        console.log("Resultado:", resultado+" Ejercicio19");
+    } catch (err) {
+        console.log("Error:", err.message+" Ejercicio19");
+    }
+}
+dividirSeguro(15, 3);
+dividirSeguro(8, 0);
+
+
+console.log("\n=== EJERCICIO 20 (async/await) ===");
+async function procesarListaAsync(arr) {
+    for (const numero of arr) {
+        await new Promise(resolve => {
+            console.log(`Procesando ... ${numero}`+`Ejercicio20`);
+            const tiempo = Math.floor(Math.random() * 1001) + 500;
+            setTimeout(resolve, tiempo);
+        });
+    }
+    console.log("Proceso completado-Ejercicio 20");
+}
+procesarListaAsync([100, 200, 300, 400, 500]);
